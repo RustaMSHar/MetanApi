@@ -25,6 +25,9 @@ namespace MetanApi.Services
         public async Task<List<Items>> GetAsync() =>
             await _itemsCollection.Find(_ => true).ToListAsync();
 
+        public async Task<List<Items>> GetAsync(FilterDefinition<Items> filter) =>
+           await _itemsCollection.Find(filter).ToListAsync();
+
         public async Task<Items?> GetAsync(string id) =>
             await _itemsCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
 
