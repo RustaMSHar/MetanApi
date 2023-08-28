@@ -10,16 +10,16 @@ namespace MetanApi.Services
         private readonly IMongoCollection<Items> _itemsCollection;
 
         public ItemsService(
-        IOptions<StoreDatabaseSettings> clothesStoreDatabaseSettings)
+        IOptions<StoreDatabaseSettings> storeDatabaseSettings)
         {
             var mongoClient = new MongoClient(
-                clothesStoreDatabaseSettings.Value.ConnectionString);
+                storeDatabaseSettings.Value.ConnectionString);
 
             var mongoDatabase = mongoClient.GetDatabase(
-                clothesStoreDatabaseSettings.Value.DatabaseName);
+                storeDatabaseSettings.Value.DatabaseName);
 
             _itemsCollection = mongoDatabase.GetCollection<Items>(
-                clothesStoreDatabaseSettings.Value.ItemsCollectionName);
+                storeDatabaseSettings.Value.ItemsCollectionName);
         }
 
         public async Task<List<Items>> GetAsync() =>
