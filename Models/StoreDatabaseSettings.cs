@@ -1,6 +1,4 @@
-﻿
-
-namespace MetanApi.Models
+﻿namespace MetanApi.Models
 {
     public class StoreDatabaseSettings
     {

@@ -14,11 +14,7 @@ namespace MetanApi.Controllers
     public class ProductsFilters : ControllerBase
     {
         private readonly ItemsService _itemsService;
-
-        public ProductsFilters(ItemsService itemsService)
-        {
-            _itemsService = itemsService;
-        }
+        public ProductsFilters(ItemsService itemsService) => _itemsService = itemsService;
 
         [HttpGet]
         public async Task<ActionResult<List<Items>>> Get(
@@ -33,8 +29,12 @@ namespace MetanApi.Controllers
             var filterBuilder = Builders<Items>.Filter;
             var filter = filterBuilder.Empty;
 
-            if (!string.IsNullOrEmpty(type)) filter &= filterBuilder.Eq(x => x.Type, type);
-                
+            if (!string.IsNullOrEmpty(type))
+            {
+                var regex = new BsonRegularExpression(type, "i");
+                filter &= filterBuilder.Regex(x => x.Type, regex);
+            }
+
             if (!string.IsNullOrEmpty(size)) filter &= filterBuilder.AnyEq(x => x.OfSize, size);
            
             if (!string.IsNullOrEmpty(name)) filter &= filterBuilder.Regex(x => x.ItemName, new BsonRegularExpression(name, "i"));
