@@ -1,6 +1,9 @@
 ﻿using MetanApi.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
+using MongoDB.Bson;
+using System.Collections.Generic;
+using System.Threading.Tasks;
 
 
 namespace MetanApi.Services
@@ -25,11 +28,11 @@ namespace MetanApi.Services
         public async Task<List<Items>> GetAsync() =>
             await _itemsCollection.Find(_ => true).ToListAsync();
 
-        public async Task<List<Items>> GetAsync(FilterDefinition<Items> filter) =>
-           await _itemsCollection.Find(filter).ToListAsync();
-
         public async Task<Items?> GetAsync(string id) =>
             await _itemsCollection.Find(x => x.Id == id).FirstOrDefaultAsync();
+
+        public async Task<List<Items>> GetAsync(FilterDefinition<Items> filter) =>
+          await _itemsCollection.Find(filter).ToListAsync();
 
         public async Task CreateAsync(Items newItem) =>
             await _itemsCollection.InsertOneAsync(newItem);

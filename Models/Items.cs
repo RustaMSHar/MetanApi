@@ -15,7 +15,7 @@ namespace MetanApi.Models
         [BsonElement("ItemName")]
         [JsonPropertyName("ItemName")]
         public string ItemName { get; set; } = null!;
-        public decimal Price { get; set; }
+        public double Price { get; set; }
         public string Type { get; set; } = null!;
         public string? Picture { get; set; } = null!;
         public string? Description { get; set; } = null!;
