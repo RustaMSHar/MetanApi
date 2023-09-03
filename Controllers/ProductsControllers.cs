@@ -50,5 +50,11 @@ namespace MetanApi.Controllers
             await _itemsService.RemoveAsync(id);
             return NoContent();
         }
+
+
+
+
     }
+
+
 }

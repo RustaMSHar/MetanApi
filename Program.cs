@@ -10,6 +10,7 @@ builder.Services.Configure<StoreDatabaseSettings>(
 
 builder.Services.AddSingleton<ItemsService>();
 
+
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
 
@@ -24,6 +25,14 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseAuthentication(); // Add this line for JWT authentication
 app.UseAuthorization();
+
+// Configure CORS policy to allow requests from any origin.
+app.UseCors(builder =>
+{
+    builder.AllowAnyOrigin()
+           .AllowAnyMethod()
+           .AllowAnyHeader();
+});
 
 app.MapControllers();
 

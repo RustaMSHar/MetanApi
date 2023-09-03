@@ -1,10 +1,8 @@
 ﻿using MetanApi.Models;
 using Microsoft.Extensions.Options;
 using MongoDB.Driver;
-using MongoDB.Bson;
 using System.Collections.Generic;
 using System.Threading.Tasks;
-
 
 namespace MetanApi.Services
 {
@@ -12,17 +10,11 @@ namespace MetanApi.Services
     {
         private readonly IMongoCollection<Items> _itemsCollection;
 
-        public ItemsService(
-        IOptions<StoreDatabaseSettings> storeDatabaseSettings)
+        public ItemsService(IOptions<StoreDatabaseSettings> storeDatabaseSettings)
         {
-            var mongoClient = new MongoClient(
-                storeDatabaseSettings.Value.ConnectionString);
-
-            var mongoDatabase = mongoClient.GetDatabase(
-                storeDatabaseSettings.Value.DatabaseName);
-
-            _itemsCollection = mongoDatabase.GetCollection<Items>(
-                storeDatabaseSettings.Value.ItemsCollectionName);
+            var mongoClient = new MongoClient(storeDatabaseSettings.Value.ConnectionString);
+            var mongoDatabase = mongoClient.GetDatabase(storeDatabaseSettings.Value.DatabaseName);
+            _itemsCollection = mongoDatabase.GetCollection<Items>(storeDatabaseSettings.Value.ItemsCollectionName);
         }
 
         public async Task<List<Items>> GetAsync() =>
@@ -42,6 +34,5 @@ namespace MetanApi.Services
 
         public async Task RemoveAsync(string id) =>
             await _itemsCollection.DeleteOneAsync(x => x.Id == id);
-
     }
 }
