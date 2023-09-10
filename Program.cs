@@ -9,7 +9,7 @@ builder.Services.Configure<StoreDatabaseSettings>(
     builder.Configuration.GetSection("MetanDataBase"));
 
 builder.Services.AddSingleton<ItemsService>();
-
+builder.Services.AddSingleton<ImageService>(); // ƒобавл€ем сервис дл€ работы с изображени€ми
 
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
