@@ -1,6 +1,15 @@
+using Serilog;
+using Serilog.Events;
 using MetanApi.Models;
 using MetanApi.Services;
 using System.Text;
+
+var logLevel = LogEventLevel.Information; // Установле уровень логирования
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Is(logLevel)
+    .WriteTo.Console()
+    .CreateLogger();
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -3,6 +3,7 @@ using MetanApi.Services;
 using System.IO;
 using System.Threading.Tasks;
 
+
 namespace MetanApi.Controllers
 {
     [ApiController]
@@ -39,7 +40,7 @@ namespace MetanApi.Controllers
             using (var memoryStream = new MemoryStream())
             {
                 await file.CopyToAsync(memoryStream);
-                var id = await _imageService.UploadImageAsync(file.FileName, memoryStream, file.ContentType);
+                var id = await _imageService.UploadImageAsync(file.FileName, memoryStream);
                 return CreatedAtAction(nameof(GetImage), new { id });
             }
         }

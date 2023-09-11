@@ -2,6 +2,7 @@
 using Microsoft.Extensions.Options;
 using MongoDB.Bson;
 using MongoDB.Driver;
+using Serilog;
 using MongoDB.Driver.GridFS;
 using System.IO;
 using System.Threading.Tasks;
@@ -15,6 +16,7 @@ namespace MetanApi.Services
 
         public ImageService(IOptions<StoreDatabaseSettings> storeDatabaseSettings)
         {
+            
             var mongoClient = new MongoClient(storeDatabaseSettings.Value.ConnectionString);
             _database = mongoClient.GetDatabase(storeDatabaseSettings.Value.ImageDatabaseName);
             _gridFSBucket = new GridFSBucket(_database);
@@ -28,13 +30,19 @@ namespace MetanApi.Services
             return imageStream.ToArray();
         }
 
-        public async Task<string> UploadImageAsync(string fileName, Stream imageStream, string contentType)
+        public async Task<string> UploadImageAsync(string fileName, Stream imageStream)
         {
-            var objectId = await _gridFSBucket.UploadFromStreamAsync(fileName, imageStream, new GridFSUploadOptions
+            try
             {
-                Metadata = new BsonDocument("contentType", contentType)
-            });
-            return objectId.ToString();
+                var objectId = await _gridFSBucket.UploadFromStreamAsync(fileName, imageStream);
+                Log.Information("Image uploaded: {FileName}", fileName);
+                return objectId.ToString();
+            }
+            catch (Exception ex)
+            {
+                Log.Error(ex, "Error uploading image: {FileName}", fileName);
+                throw; 
+            }
         }
 
         public async Task DeleteImageAsync(string id)
