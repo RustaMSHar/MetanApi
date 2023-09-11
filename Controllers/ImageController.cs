@@ -25,7 +25,7 @@ namespace MetanApi.Controllers
                 return NotFound();
             }
 
-            return File(imageBytes, "image/jpeg"); // Измените тип содержимого на соответствующий вашим изображениям
+            return File(imageBytes, "image/jpeg"); 
         }
 
         [HttpPost]
