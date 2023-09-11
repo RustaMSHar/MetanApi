@@ -16,7 +16,7 @@ namespace MetanApi.Services
         public ImageService(IOptions<StoreDatabaseSettings> storeDatabaseSettings)
         {
             var mongoClient = new MongoClient(storeDatabaseSettings.Value.ConnectionString);
-            _database = mongoClient.GetDatabase(storeDatabaseSettings.Value.DatabaseName);
+            _database = mongoClient.GetDatabase(storeDatabaseSettings.Value.ImageDatabaseName);
             _gridFSBucket = new GridFSBucket(_database);
 
         }
