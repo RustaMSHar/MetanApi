@@ -9,8 +9,12 @@ namespace MetanApi.Models
         [BsonRepresentation(BsonType.ObjectId)]
         public string? Id { get; set; }
 
-        public string FileName { get; set; } = null!;
-        public byte[] Data { get; set; } = null!;
-        public string ContentType { get; set; } = null!;
+        public Int64? length { get; set; }
+        public Int32 chunkSize { get; set; }
+        public DateOnly uploadDate { get; set; }
+        public string md5 { get; set; } = null!;
+
+        [BsonElement("filename")]
+        public string filename { get; set; } = null!;
     }
 }
