@@ -5,6 +5,7 @@ using MongoDB.Driver;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using MongoDB.Bson;
+using System.Xml.Linq;
 
 namespace MetanApi.Controllers
 {
@@ -14,7 +15,10 @@ namespace MetanApi.Controllers
     public class ProductsFilters : ControllerBase
     {
         private readonly ItemsService _itemsService;
+        
         public ProductsFilters(ItemsService itemsService) => _itemsService = itemsService;
+
+
 
         [HttpGet]
         public async Task<ActionResult<List<Items>>> Get(
@@ -24,7 +28,6 @@ namespace MetanApi.Controllers
             [FromQuery(Name = "price")] double? price,
             [FromQuery(Name = "maxprice")] double? maxprice,
             [FromQuery(Name = "minprice")] double? minprice )
-
         {
             var filterBuilder = Builders<Items>.Filter;
             var filter = filterBuilder.Empty;
@@ -46,7 +49,10 @@ namespace MetanApi.Controllers
             if (price.HasValue) filter &= filterBuilder.Eq(x => x.Price, price.Value);
            
             var items = await _itemsService.GetAsync(filter);
+            
             return items;
         }
+
+     
     }
 }
