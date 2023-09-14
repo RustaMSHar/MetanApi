@@ -39,4 +39,17 @@ public class ImageController : ControllerBase
         }
         return BadRequest("No file in the request");
     }
+
+    [HttpDelete("{id}")]
+    public async Task<IActionResult> DeleteImage(string id)
+    {
+        var (success, errorMessage) = await _imageService.DeleteImageAsync(id);
+        if (success)
+        {
+            return Ok("Image deleted successfully");
+        }
+        return BadRequest($"Failed to delete image: {errorMessage}");
+    }
+
+
 }

@@ -43,5 +43,24 @@ namespace MetanApi.Services
             };
             return await _gridFSBucket.UploadFromStreamAsync(fileName, stream, options);
         }
+
+        public async Task<(bool Success, string ErrorMessage)> DeleteImageAsync(string id)
+        {
+            if (ObjectId.TryParse(id, out ObjectId objectId))
+            {
+                try
+                {
+                    await _gridFSBucket.DeleteAsync(objectId);
+                    return (true, null); 
+                }
+                catch (Exception ex)
+                {
+                    return (false, ex.Message); 
+                }
+            }
+            return (false, "Invalid ObjectId"); 
+        }
+
+
     }
 }
