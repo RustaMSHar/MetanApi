@@ -3,6 +3,9 @@ using Serilog.Events;
 using MetanApi.Models;
 using MetanApi.Services;
 using System.Text;
+using MongoDB.Driver.GridFS;
+using MongoDB.Driver;
+using Microsoft.Extensions.Options;
 
 var logLevel = LogEventLevel.Information; // ”становле уровень логировани€
 
@@ -13,17 +16,20 @@ Log.Logger = new LoggerConfiguration()
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 // Add services to the container.
 builder.Services.Configure<StoreDatabaseSettings>(
     builder.Configuration.GetSection("MetanDataBase"));
 
+
 builder.Services.AddSingleton<ItemsService>();
-builder.Services.AddSingleton<ImageService>(); // ƒобавл€ем сервис дл€ работы с изображени€ми
+builder.Services.AddSingleton<ImageService>(); 
 
 builder.Services.AddControllers()
     .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
 
 var app = builder.Build();
+
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

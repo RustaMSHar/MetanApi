@@ -1,55 +1,55 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using MetanApi.Services;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using MongoDB.Bson;
+using MongoDB.Driver.GridFS;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
-
-namespace MetanApi.Controllers
+[Route("api/images")]
+[ApiController]
+public class ImageController : ControllerBase
 {
-    [ApiController]
-    [Route("api/images")]
-    public class ImageController : ControllerBase
+    private readonly IGridFSBucket _gridFSBucket;
+
+    public ImageController(IGridFSBucket gridFSBucket)
     {
-        private readonly ImageService _imageService;
+        _gridFSBucket = gridFSBucket;
+    }
 
-        public ImageController(ImageService imageService)
+    [HttpGet("{id}")]
+    public async Task<IActionResult> GetImage(string id)
+    {
+        if (ObjectId.TryParse(id, out ObjectId objectId))
         {
-            _imageService = imageService;
+            var fileStream = await _gridFSBucket.OpenDownloadStreamAsync(objectId);
+            return File(fileStream, fileStream.FileInfo.ContentType);
         }
-
-        [HttpGet("{id:length(24)}")]
-        public async Task<IActionResult> GetImage(string id)
+        else
         {
-            var imageBytes = await _imageService.GetImageAsync(id);
-            if (imageBytes == null)
-            {
-                return NotFound();
-            }
-
-            return File(imageBytes, "image/jpeg"); 
+            return BadRequest("Invalid ObjectId");
         }
+    }
 
-        [HttpPost]
-        public async Task<IActionResult> UploadImage([FromForm] IFormFile file)
+    [HttpPost("upload")]
+    public async Task<IActionResult> UploadImage(IFormFile file)
+    {
+        if (file != null && file.Length > 0)
         {
-            if (file == null || file.Length == 0)
+            using (var stream = file.OpenReadStream())
             {
-                return BadRequest("Invalid file.");
-            }
+                var options = new GridFSUploadOptions
+                {
+                    Metadata = new BsonDocument("filename", file.FileName)
+                };
 
-            using (var memoryStream = new MemoryStream())
-            {
-                await file.CopyToAsync(memoryStream);
-                var id = await _imageService.UploadImageAsync(file.FileName, memoryStream);
-                return CreatedAtAction(nameof(GetImage), new { id });
+                ObjectId objectId = await _gridFSBucket.UploadFromStreamAsync(file.FileName, stream, options);
+                return Ok($"File uploaded with ObjectId: {objectId}");
             }
         }
-
-        [HttpDelete("{id:length(24)}")]
-        public async Task<IActionResult> DeleteImage(string id)
+        else
         {
-            await _imageService.DeleteImageAsync(id);
-            return NoContent();
+            return BadRequest("No file in the request");
         }
     }
 }
