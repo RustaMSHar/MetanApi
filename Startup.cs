@@ -44,7 +44,7 @@ public class Startup
         }
 
         app.UseHttpsRedirection();
-        app.UseAuthentication(); // Добавьте эту строку для аутентификации JWT
+        app.UseAuthentication(); //аутентификации JWT
         app.UseAuthorization();
 
         // Настройка политики CORS для разрешения запросов с любых источников

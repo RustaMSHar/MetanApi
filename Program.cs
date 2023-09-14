@@ -16,9 +16,9 @@ public class Program
 
     public static IHostBuilder CreateHostBuilder(string[] args) =>
         Host.CreateDefaultBuilder(args)
-            .UseSerilog() // Используйте Serilog для логирования
+            .UseSerilog() //Serilog для логирования
             .ConfigureWebHostDefaults(webBuilder =>
             {
-                webBuilder.UseStartup<Startup>(); // Используйте класс Startup
+                webBuilder.UseStartup<Startup>(); // класс Startup
             });
 }
