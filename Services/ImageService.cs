@@ -1,47 +1,47 @@
-﻿using MetanApi.Models;
-using MongoDB.Bson;
-using MongoDB.Driver;
+﻿using MongoDB.Driver;
 using MongoDB.Driver.GridFS;
+using System;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.Extensions.Options;
+using MetanApi.Models;
+using MongoDB.Bson;
 
-public class ImageService
+namespace MetanApi.Services
 {
-    private readonly IMongoCollection<BsonDocument> _filesCollection;
-    private readonly IGridFSBucket _gridFSBucket;
-
-    public ImageService(StoreDatabaseSettings databaseSettings)
+    public class ImageService
     {
-        var client = new MongoClient(databaseSettings.ConnectionString);
-        var database = client.GetDatabase(databaseSettings.ImageDatabaseName);
-        _gridFSBucket = new GridFSBucket(database);
-        _filesCollection = database.GetCollection<BsonDocument>("fs.files");
-    }
+        private readonly IMongoDatabase _database;
+        private readonly IGridFSBucket _gridFSBucket;
 
-    public async Task<ObjectId> UploadImageAsync(Stream stream, string filename)
-    {
-        var options = new GridFSUploadOptions
+        public ImageService(IOptions<StoreDatabaseSettings> settings)
         {
-            Metadata = new BsonDocument("filename", filename)
-        };
-
-        ObjectId objectId = await _gridFSBucket.UploadFromStreamAsync(filename, stream, options);
-        return objectId;
-    }
-
-    public async Task<Stream> GetImageStreamAsync(ObjectId objectId)
-    {
-        var filter = Builders<BsonDocument>.Filter.Eq("_id", objectId);
-        var fileDocument = await _filesCollection.Find(filter).FirstOrDefaultAsync();
-
-        if (fileDocument != null)
-        {
-            var filename = fileDocument.GetValue("filename").AsString;
-            return await _gridFSBucket.OpenDownloadStreamByNameAsync(filename);
+            var client = new MongoClient(settings.Value.ConnectionString);
+            _database = client.GetDatabase(settings.Value.ImageDatabaseName);
+            _gridFSBucket = new GridFSBucket(_database);
         }
-        else
+
+        public async Task<byte[]> GetImageBytesAsync(string id)
         {
-            return null; // Файл не найден
+            if (ObjectId.TryParse(id, out ObjectId objectId))
+            {
+                var fileStream = await _gridFSBucket.OpenDownloadStreamAsync(objectId);
+                using (var memoryStream = new MemoryStream())
+                {
+                    await fileStream.CopyToAsync(memoryStream);
+                    return memoryStream.ToArray();
+                }
+            }
+            return null;
+        }
+
+        public async Task<ObjectId> UploadImageAsync(string fileName, Stream stream)
+        {
+            var options = new GridFSUploadOptions
+            {
+                Metadata = new BsonDocument("filename", fileName)
+            };
+            return await _gridFSBucket.UploadFromStreamAsync(fileName, stream, options);
         }
     }
 }

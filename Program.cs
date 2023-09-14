@@ -1,54 +1,24 @@
+using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Hosting;
 using Serilog;
-using Serilog.Events;
-using MetanApi.Models;
-using MetanApi.Services;
-using System.Text;
-using MongoDB.Driver.GridFS;
-using MongoDB.Driver;
-using Microsoft.Extensions.Options;
 
-var logLevel = LogEventLevel.Information; // Установле уровень логирования
-
-Log.Logger = new LoggerConfiguration()
-    .MinimumLevel.Is(logLevel)
-    .WriteTo.Console()
-    .CreateLogger();
-
-var builder = WebApplication.CreateBuilder(args);
-
-
-// Add services to the container.
-builder.Services.Configure<StoreDatabaseSettings>(
-    builder.Configuration.GetSection("MetanDataBase"));
-
-
-builder.Services.AddSingleton<ItemsService>();
-builder.Services.AddSingleton<ImageService>(); 
-
-builder.Services.AddControllers()
-    .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
-
-var app = builder.Build();
-
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+public class Program
 {
-    app.UseDeveloperExceptionPage();
+    public static void Main(string[] args)
+    {
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Information()
+            .WriteTo.Console()
+            .CreateLogger();
+
+        CreateHostBuilder(args).Build().Run();
+    }
+
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .UseSerilog() // Используйте Serilog для логирования
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>(); // Используйте класс Startup
+            });
 }
-
-app.UseHttpsRedirection();
-app.UseAuthentication(); // Add this line for JWT authentication
-app.UseAuthorization();
-
-// Configure CORS policy to allow requests from any origin.
-app.UseCors(builder =>
-{
-    builder.AllowAnyOrigin()
-           .AllowAnyMethod()
-           .AllowAnyHeader();
-});
-
-app.MapControllers();
-
-app.Run();

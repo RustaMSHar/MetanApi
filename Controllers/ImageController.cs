@@ -1,34 +1,29 @@
 ﻿using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using MongoDB.Bson;
-using MongoDB.Driver.GridFS;
+using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
+using MetanApi.Services;
 
 [Route("api/images")]
-[ApiController]
 public class ImageController : ControllerBase
 {
-    private readonly IGridFSBucket _gridFSBucket;
+    private readonly ImageService _imageService;
 
-    public ImageController(IGridFSBucket gridFSBucket)
+    public ImageController(ImageService imageService)
     {
-        _gridFSBucket = gridFSBucket;
+        _imageService = imageService;
     }
 
     [HttpGet("{id}")]
     public async Task<IActionResult> GetImage(string id)
     {
-        if (ObjectId.TryParse(id, out ObjectId objectId))
+        var imageBytes = await _imageService.GetImageBytesAsync(id);
+        if (imageBytes != null)
         {
-            var fileStream = await _gridFSBucket.OpenDownloadStreamAsync(objectId);
-            return File(fileStream, fileStream.FileInfo.ContentType);
+            return File(imageBytes, "image/jpeg"); 
         }
-        else
-        {
-            return BadRequest("Invalid ObjectId");
-        }
+        return NotFound();
     }
 
     [HttpPost("upload")]
@@ -38,18 +33,10 @@ public class ImageController : ControllerBase
         {
             using (var stream = file.OpenReadStream())
             {
-                var options = new GridFSUploadOptions
-                {
-                    Metadata = new BsonDocument("filename", file.FileName)
-                };
-
-                ObjectId objectId = await _gridFSBucket.UploadFromStreamAsync(file.FileName, stream, options);
+                var objectId = await _imageService.UploadImageAsync(file.FileName, stream);
                 return Ok($"File uploaded with ObjectId: {objectId}");
             }
         }
-        else
-        {
-            return BadRequest("No file in the request");
-        }
+        return BadRequest("No file in the request");
     }
 }
