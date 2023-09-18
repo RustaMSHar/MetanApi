@@ -32,6 +32,8 @@ public class Startup
         services.AddSingleton<ItemsService>();
         services.AddSingleton<ImageService>();
 
+        //services.AddCoreAdmin();
+
         services.AddControllers()
             .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
     }
@@ -54,11 +56,13 @@ public class Startup
                 .AllowAnyMethod()
                 .AllowAnyHeader();
         });
-
+        
         app.UseRouting();
         app.UseEndpoints(endpoints =>
         {
             endpoints.MapControllers();
         });
+
+        //app.UseCoreAdminCustomUrl("adminpanel");
     }
 }
