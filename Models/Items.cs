@@ -17,7 +17,7 @@ namespace MetanApi.Models
         public string ItemName { get; set; } = null!;
         public double Price { get; set; }
         public string Type { get; set; } = null!;
-        public string? Picture { get; set; } = null!;
+        public string? Picture { get; set; }
         public string? Description { get; set; } = null!;
         public string[]? OfSize { get; set; }
         public bool IsExist { get; set; }

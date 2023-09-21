@@ -83,6 +83,23 @@ namespace MetanApi.Admin.Services
             return (false, "Invalid ObjectId");
         }
 
+        // Добавьте метод для связывания fs.files с Items
+        public async Task<bool> LinkImageToItemAsync(string itemId, string imageId)
+        {
+            if (ObjectId.TryParse(itemId, out ObjectId itemObjectId))
+            {
+                var filter = Builders<Items>.Filter.Eq(x => x.Id, itemId);
+                var update = Builders<Items>.Update.Set(x => x.Picture, imageId); // Используйте поле Picture для хранения _id изображения
+
+                var result = await _itemsCollection.UpdateOneAsync(filter, update);
+
+                return result.IsAcknowledged && result.ModifiedCount > 0;
+            }
+
+            return false;
+        }
+
+
 
     }
 }
