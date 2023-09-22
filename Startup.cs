@@ -6,6 +6,7 @@ using Serilog;
 using Serilog.Events;
 using MetanApi.Models;
 using MetanApi.Services;
+using MetanApi.Admin.Services;
 
 public class Startup
 {
@@ -31,6 +32,7 @@ public class Startup
         // Добавление сервисов в контейнер зависимостей
         services.AddSingleton<ItemsService>();
         services.AddSingleton<ImageService>();
+        services.AddSingleton<AdminService>(); //AdminService
 
         //services.AddCoreAdmin();
 
