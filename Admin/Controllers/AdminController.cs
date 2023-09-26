@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using MongoDB.Bson;
+using MongoDB.Driver;
 using System.IO;
 using System.Threading.Tasks;
 
@@ -19,6 +20,15 @@ namespace MetanApi.Controllers
         public AdminController(AdminService adminService)
         {
             _adminService = adminService;
+        }
+
+        // Получение товаров по типу
+        [HttpGet("getItemsByType/{type}")]
+        public async Task<ActionResult<List<Items>>> GetItemsByTypeAsync(string type)
+        {
+            var filter = Builders<Items>.Filter.Eq(x => x.Type, type);
+            var items = await _adminService.GetAsync(filter);
+            return Ok(items);
         }
 
         // Добавление нового товара
@@ -94,5 +104,8 @@ namespace MetanApi.Controllers
                 return BadRequest($"Failed to delete image: {errorMessage}");
             }
         }
+
+
+
     }
 }
