@@ -36,7 +36,7 @@ namespace MetanApi.Controllers
         public async Task<ActionResult<Items>> AddItemAsync([FromBody] Items newItem)
         {
             await _adminService.CreateAsync(newItem);
-            return Ok(newItem);
+            return Ok(newItem.Id);
         }
 
         // Обновление данных о товаре
