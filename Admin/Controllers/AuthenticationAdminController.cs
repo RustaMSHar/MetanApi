@@ -1,6 +1,8 @@
-﻿namespace MetanApi.Admin.Controllers
+﻿using Microsoft.AspNetCore.Mvc;
+
+namespace MetanApi.Admin.Controllers
 {
-    public class AuthenticationAdminController
+    public class AuthenticationAdminController : ControllerBase
     {
     }
 }
