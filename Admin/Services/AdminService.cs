@@ -66,6 +66,25 @@ namespace MetanApi.Admin.Services
             return await _gridFSBucket.UploadFromStreamAsync(fileName, stream, options);
         }
 
+        public async Task<List<ObjectId>> UploadImagesAsync(IEnumerable<IFormFile> files)
+        {
+            var imageIds = new List<ObjectId>();
+
+            foreach (var file in files)
+            {
+                using (var stream = file.OpenReadStream())
+                {
+                    var imageId = await UploadImageAsync(file.FileName, stream);
+                    if (imageId != ObjectId.Empty)
+                    {
+                        imageIds.Add(imageId);
+                    }
+                }
+            }
+
+            return imageIds;
+        }
+
         public async Task<(bool Success, string ErrorMessage)> DeleteImageAsync(string id)
         {
             if (ObjectId.TryParse(id, out ObjectId objectId))
@@ -98,7 +117,6 @@ namespace MetanApi.Admin.Services
 
             return false;
         }
-
 
 
     }

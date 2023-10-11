@@ -10,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace MetanApi.Controllers
 {
-    
+
     [Route("api/admin")]
     [ApiController]
     public class AdminController : ControllerBase
@@ -88,6 +88,38 @@ namespace MetanApi.Controllers
                 }
             }
         }
+        // Загрузка изображений и связывание с товаром
+
+        [HttpPost("uploadImages")]
+        public async Task<ActionResult<List<ObjectId>>> UploadImagesAsync(List<IFormFile> files, [FromForm] string[] itemIds)
+        {
+            if (files.Count != itemIds.Length)
+            {
+                return BadRequest("The number of files should match the number of itemIds.");
+            }
+
+            var imageIds = await _adminService.UploadImagesAsync(files);
+
+            if (imageIds.Count > 0)
+            {
+                // Связать изображения с товарами
+                for (int i = 0; i < imageIds.Count; i++)
+                {
+                    var success = await _adminService.LinkImageToItemAsync(itemIds[i], imageIds[i].ToString());
+                    if (!success)
+                    {
+                        return BadRequest("Failed to link some images to items.");
+                    }
+                }
+
+                return Ok(imageIds);
+            }
+            else
+            {
+                // Обработка ошибки загрузки изображений
+                return BadRequest("Failed to upload images.");
+            }
+        }
 
         // Удаление изображения
         [HttpDelete("deleteImage/{id}")]
@@ -104,7 +136,6 @@ namespace MetanApi.Controllers
                 return BadRequest($"Failed to delete image: {errorMessage}");
             }
         }
-
 
 
     }
