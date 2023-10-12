@@ -7,6 +7,9 @@ using Serilog.Events;
 using MetanApi.Models;
 using MetanApi.Services;
 using MetanApi.Admin.Services;
+using Microsoft.AspNetCore.Identity;
+using AspNetCore.Identity.Mongo;
+using MongoDB.Driver;
 
 public class Startup
 {
@@ -32,12 +35,20 @@ public class Startup
         // Добавление сервисов в контейнер зависимостей
         services.AddSingleton<ItemsService>();
         services.AddSingleton<ImageService>();
-        services.AddSingleton<AdminService>(); //AdminService
+        services.AddSingleton<AdminService>(); 
 
         //services.AddCoreAdmin();
 
         services.AddControllers()
             .AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
+
+        
+
+
+        // Добавляем сервис пользователя
+        services.AddScoped<UserService>();
+        services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.PropertyNamingPolicy = null);
+
     }
 
     public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
